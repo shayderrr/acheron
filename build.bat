@@ -142,6 +142,10 @@ call :resolve_qt
 if errorlevel 1 exit /b 1
 set "PATH=!QT_ROOT_DIR!\bin;!PATH!"
 
+set "STALE=0"
+if exist "!BUILD_DIR!\CMakeCache.txt" call :check_cache
+if "!STALE!"=="1" rmdir /s /q "!BUILD_DIR!"
+
 cmake -S "!ROOT!" -B "!BUILD_DIR!" -G "Visual Studio 17 2022" -A x64 "-DCMAKE_BUILD_TYPE=!CONFIG!" -DVCPKG_TARGET_TRIPLET=x64-windows-static-md "-DCMAKE_PREFIX_PATH=!QT_ROOT_DIR!;!FFMPEG_DIR!" "-DCURL_INCLUDE_DIR=!CURL_IMP_DIR!\include" "-DCURL_LIBRARY=!CURL_IMP_DIR!\lib\libcurl-impersonate_imp.lib" -DBUILD_TESTS=ON
 if errorlevel 1 exit /b 1
 
@@ -162,6 +166,14 @@ rmdir /s /q "!BIN!\generic" 2>nul
 for %%F in ("!BIN!\sqldrivers\*.dll") do if /i not "%%~nxF"=="qsqlite.dll" del "%%F" 2>nul
 
 echo Build complete: !BIN!\acheron.exe
+exit /b 0
+
+:check_cache
+for /f "tokens=1* delims==" %%A in ('findstr "CMAKE_HOME_DIRECTORY:INTERNAL= CMAKE_CACHEFILE_DIR:INTERNAL=" "!BUILD_DIR!\CMakeCache.txt" 2^>nul') do call :check_cache_line "%%A" "%%B"
+exit /b 0
+:check_cache_line
+if /i "%~1"=="CMAKE_HOME_DIRECTORY:INTERNAL" if /i not "%~2"=="%ROOT%" set "STALE=1"
+if /i "%~1"=="CMAKE_CACHEFILE_DIR:INTERNAL" if /i not "%~2"=="%BUILD_DIR%" set "STALE=1"
 exit /b 0
 
 :add_missing

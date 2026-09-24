@@ -272,6 +272,14 @@ CMAKE_ARGS=(
     -DBUILD_TESTS=ON
 )
 
+if [ -f "$BUILD_DIR/CMakeCache.txt" ]; then
+    CACHED_SRC="$(grep '^CMAKE_HOME_DIRECTORY:INTERNAL=' "$BUILD_DIR/CMakeCache.txt" | cut -d= -f2- || true)"
+    CACHED_BIN="$(grep '^CMAKE_CACHEFILE_DIR:INTERNAL=' "$BUILD_DIR/CMakeCache.txt" | cut -d= -f2- || true)"
+    if [ "$CACHED_SRC" != "$ROOT" ] || [ "$CACHED_BIN" != "$BUILD_DIR" ]; then
+        rm -rf "$BUILD_DIR"
+    fi
+fi
+
 cmake "${CMAKE_ARGS[@]}"
 cmake --build "$BUILD_DIR" --parallel "$JOBS"
 
