@@ -58,5 +58,13 @@ Latest nightly Windows build: https://nightly.link/ouwou/acheron/workflows/build
 * rnnoise (optional, noise suppression, vendored)
 
 ### Build Instructions:
+```bash
+git clone https://github.com/ouwou/acheron.git
 
-Later
+cd acheron
+```
+
+.\build.bat on windows or ./build.sh on linux
+
+
+scripts auto install deps

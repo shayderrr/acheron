@@ -6,3 +6,6 @@ CMakeUserPresets.json
 *.aps
 .planning/
 /build
+/Qt/
+/curl-impersonate/
+/ffmpeg/
